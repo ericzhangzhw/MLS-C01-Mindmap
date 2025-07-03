@@ -13,4 +13,3 @@ markmap:
 - other
 - another
 - another
-- another
