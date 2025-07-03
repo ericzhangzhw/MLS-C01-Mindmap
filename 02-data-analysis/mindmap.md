@@ -3,7 +3,7 @@ title: 02-data-analysis
 markmap:
   colorFreezeLevel: 2
 ---
-![Mind Map](img/mindmap.svg)
+![Mind Map](img/mindmap.png)
 
 ## Missing Data
 - Missing Completely At Random (MCAR)
@@ -11,5 +11,6 @@ markmap:
 - median
 - KNN imputation
 - other
+- another
 - another
 - another

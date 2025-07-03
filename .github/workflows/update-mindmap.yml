@@ -1,4 +1,4 @@
-name: Generate and Embed Mind Map SVG
+name: Generate Mind Map Image
 
 permissions:
   contents: write
@@ -9,7 +9,7 @@ on:
       - '02-data-analysis/mindmap.md'
 
 jobs:
-  generate:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,32 +21,24 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install markmap-cli
-        run: npm install -g markmap-cli
+      - name: Install dependencies
+        run: |
+          npm install -g markmap-cli
+          npm install puppeteer
 
       - name: Create output folder
         run: mkdir -p 02-data-analysis/img
 
-      - name: Generate mindmap.svg
-        run: npx markmap-cli 02-data-analysis/mindmap.md -o 02-data-analysis/img/mindmap.svg
+      - name: Generate mindmap.html from Markdown
+        run: npx markmap-cli 02-data-analysis/mindmap.md -o 02-data-analysis/img/mindmap.html
 
-      - name: Prepend image embed to Markdown (if not already present)
-        run: |
-          IMAGE_LINE='![Mind Map](img/mindmap.svg)'
-          FILE=02-data-analysis/mindmap.md
-          TEMP_FILE=$(mktemp)
+      - name: Export to PNG using Puppeteer
+        run: node scripts/export-png.js
 
-          if ! grep -qF "$IMAGE_LINE" "$FILE"; then
-            echo "$IMAGE_LINE" > "$TEMP_FILE"
-            echo "" >> "$TEMP_FILE"
-            cat "$FILE" >> "$TEMP_FILE"
-            mv "$TEMP_FILE" "$FILE"
-          fi
-
-      - name: Commit and push changes
+      - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add 02-data-analysis/img/mindmap.svg 02-data-analysis/mindmap.md
-          git commit -m "Auto-generate mind map SVG and embed in Markdown" || echo "No changes"
+          git add 02-data-analysis/img/mindmap.html 02-data-analysis/img/mindmap.png
+          git commit -m "Auto-generate mind map PNG" || echo "No changes"
           git push
