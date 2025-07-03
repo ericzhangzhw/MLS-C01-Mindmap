@@ -29,16 +29,16 @@ jobs:
       - name: Create output folder
         run: mkdir -p 02-data-analysis/img
 
-      - name: Generate mindmap.html from Markdown
-        run: npx markmap-cli 02-data-analysis/mindmap.md -o 02-data-analysis/img/mindmap.html
+      - name: Install dependencies
+        run: npm install markmap-lib markmap-render node-html-to-image
 
-      - name: Export to PNG using Puppeteer
-        run: node scripts/export-png.js
+      - name: Generate mind map image
+        run: node scripts/export-markmap-image.js
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add 02-data-analysis/img/mindmap.html 02-data-analysis/img/mindmap.png
+          git add 02-data-analysis/img/mindmap.png
           git commit -m "Auto-generate mind map PNG" || echo "No changes"
           git push
