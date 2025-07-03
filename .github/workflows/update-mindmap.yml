@@ -1,0 +1,49 @@
+name: Generate and Embed Mind Map SVG
+
+on:
+  push:
+    paths:
+      - '02-data-analysis/mindmap.md'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install markmap-cli
+        run: npm install -g markmap-cli
+
+      - name: Create output folder
+        run: mkdir -p 02-data-analysis/img
+
+      - name: Generate mindmap.svg
+        run: npx markmap-cli 02-data-analysis/mindmap.md -o 02-data-analysis/img/mindmap.svg
+
+      - name: Prepend image embed to Markdown (if not already present)
+        run: |
+          IMAGE_LINE='![Mind Map](img/mindmap.svg)'
+          FILE=02-data-analysis/mindmap.md
+          TEMP_FILE=$(mktemp)
+
+          if ! grep -qF "$IMAGE_LINE" "$FILE"; then
+            echo "$IMAGE_LINE" > "$TEMP_FILE"
+            echo "" >> "$TEMP_FILE"
+            cat "$FILE" >> "$TEMP_FILE"
+            mv "$TEMP_FILE" "$FILE"
+          fi
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add 02-data-analysis/img/mindmap.svg 02-data-analysis/mindmap.md
+          git commit -m "Auto-generate mind map SVG and embed in Markdown" || echo "No changes"
+          git push
