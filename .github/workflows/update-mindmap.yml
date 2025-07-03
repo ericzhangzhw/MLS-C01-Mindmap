@@ -1,5 +1,8 @@
 name: Generate and Embed Mind Map SVG
 
+permissions:
+  contents: write
+
 on:
   push:
     paths:
