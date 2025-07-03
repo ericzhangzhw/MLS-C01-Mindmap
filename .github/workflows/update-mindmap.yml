@@ -1,4 +1,4 @@
-name: Generate Mind Map Image
+name: Generate and Embed Mind Map PNG
 
 permissions:
   contents: write
@@ -7,9 +7,10 @@ on:
   push:
     paths:
       - '02-data-analysis/mindmap.md'
+      - 'scripts/export-markmap-image.js'
 
 jobs:
-  build:
+  generate:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,22 +24,15 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install -g markmap-cli
-          npm install puppeteer
+          npm install markmap-lib markmap-render node-html-to-image
 
-      - name: Create output folder
-        run: mkdir -p 02-data-analysis/img
-
-      - name: Install dependencies
-        run: npm install markmap-lib markmap-render node-html-to-image
-
-      - name: Generate mind map image
+      - name: Generate mind map PNG from Markdown
         run: node scripts/export-markmap-image.js
 
-      - name: Commit and push
+      - name: Commit and push generated image
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add 02-data-analysis/img/mindmap.png
-          git commit -m "Auto-generate mind map PNG" || echo "No changes"
+          git commit -m "Auto-generate mind map image from Markdown" || echo "No changes"
           git push
