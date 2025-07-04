@@ -26,16 +26,18 @@ jobs:
         run: |
           npm install markmap-lib markmap-render node-html-to-image puppeteer
 
-      - name: Install Chromium for Puppeteer
+      - name: Manually install Chromium
         run: |
-          npx puppeteer browsers install chrome
+          mkdir -p ~/.cache/puppeteer/chrome/linux-138.0.7204.92
+          curl -Lo ~/.cache/puppeteer/chrome/linux-138.0.7204.92/chrome-linux64.zip https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/1211803/chrome-linux64.zip
+          unzip ~/.cache/puppeteer/chrome/linux-138.0.7204.92/chrome-linux64.zip -d ~/.cache/puppeteer/chrome/linux-138.0.7204.92
+          chmod +x ~/.cache/puppeteer/chrome/linux-138.0.7204.92/chrome-linux64/chrome
 
-      - name: Get Chromium path
-        id: chromium
+      - name: Set CHROME path
         run: |
-          echo "PUPPETEER_EXECUTABLE_PATH=$(npx puppeteer browsers install chrome --print-path)" >> $GITHUB_ENV
+          echo "PUPPETEER_EXECUTABLE_PATH=$HOME/.cache/puppeteer/chrome/linux-138.0.7204.92/chrome-linux64/chrome" >> $GITHUB_ENV
 
-      - name: Render mind map to PNG
+      - name: Render Markmap PNG
         run: node scripts/export-markmap-image.js
 
       - name: Commit and push image
@@ -43,5 +45,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add 02-data-analysis/img/mindmap.png
-          git commit -m "Auto-generated Markmap PNG from mindmap.md" || echo "No changes"
+          git commit -m "Auto-generated Markmap PNG" || echo "No changes"
           git push
