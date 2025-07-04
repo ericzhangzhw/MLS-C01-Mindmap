@@ -22,18 +22,22 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Puppeteer and Markmap dependencies
+      - name: Install Node dependencies
         run: |
           npm install markmap-lib markmap-render node-html-to-image puppeteer
 
-      - name: Download Chromium for Puppeteer
+      - name: Download Chromium
         run: |
           npx puppeteer browsers install chrome
 
+      - name: Set CHROME_PATH
+        id: chromium
+        run: echo "CHROME_PATH=$(npx puppeteer browsers install chrome --print-path)" >> $GITHUB_ENV
+
       - name: Generate mind map PNG from Markdown
-        env:
-          PUPPETEER_EXECUTABLE_PATH: $(npx puppeteer browsers install chrome --print-path)
         run: node scripts/export-markmap-image.js
+        env:
+          PUPPETEER_EXECUTABLE_PATH: ${{ env.CHROME_PATH }}
 
       - name: Commit and push generated image
         run: |
