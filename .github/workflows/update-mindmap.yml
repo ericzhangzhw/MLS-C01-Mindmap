@@ -18,18 +18,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # The 'cache' line has been removed from this step
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # Cache npm packages for faster subsequent runs
-          cache: 'npm'
 
-      # 1. Install dependencies locally (no -g flag)
       - name: Install Dependencies
         run: npm install markmap-cli puppeteer
 
-      # 2. Generate HTML using npx
       - name: Generate HTML from mindmap.md
         run: npx markmap-cli --no-open 02-data-analysis/mindmap.md -o 02-data-analysis/img/mindmap.html
 
