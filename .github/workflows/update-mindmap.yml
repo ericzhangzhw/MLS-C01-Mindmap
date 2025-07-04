@@ -13,9 +13,6 @@ jobs:
   generate:
     runs-on: ubuntu-latest
 
-    env:
-      PUPPETEER_SKIP_DOWNLOAD: true
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -25,23 +22,17 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install system dependencies for Chromium
+      - name: Install Puppeteer and Markmap dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libx11-xcb1 libxcomposite1 libxcursor1 libxdamage1 libxi6 \
-            libxtst6 libnss3 libxrandr2 libasound2-data libatk1.0-0 \
-            libatk-bridge2.0-0 libcups2 libdrm2 libgbm1 libnspr4 \
-            libxss1 libxshmfence1 xdg-utils libglib2.0-0 libpangocairo-1.0-0 \
-            libpango-1.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 fonts-liberation \
-            ca-certificates wget
+          npm install markmap-lib markmap-render node-html-to-image puppeteer
 
-
-      - name: Install Node dependencies
+      - name: Download Chromium for Puppeteer
         run: |
-          npm install markmap-lib markmap-render node-html-to-image
+          npx puppeteer browsers install chrome
 
       - name: Generate mind map PNG from Markdown
+        env:
+          PUPPETEER_EXECUTABLE_PATH: $(npx puppeteer browsers install chrome --print-path)
         run: node scripts/export-markmap-image.js
 
       - name: Commit and push generated image

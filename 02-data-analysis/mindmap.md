@@ -11,4 +11,3 @@ markmap:
 - median
 - KNN imputation
 - other
-- another
