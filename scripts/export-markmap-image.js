@@ -1,52 +1,42 @@
-import { readFile, writeFile } from 'node:fs/promises';
-import path from 'node:path';
-import { Transformer } from 'markmap-lib';
-import { fillTemplate } from 'markmap-render';
-import nodeHtmlToImage from 'node-html-to-image';
-import puppeteer from 'puppeteer';
+// .github/scripts/export-markmap-image.js
+const puppeteer = require('puppeteer');
+const path = require('path');
 
-async function renderMarkmap(mdPath, outPath) {
-  try {
-    const markdown = await readFile(mdPath, 'utf8');
+(async () => {
+  // Get file paths from command line arguments
+  const htmlFilePath = process.argv[2];
+  const outputPngPath = process.argv[3];
 
-    const transformer = new Transformer();
-    const { root, features } = transformer.transform(markdown);
-    const assets = transformer.getUsedAssets(features);
-
-    const html =
-      fillTemplate(root, assets, {
-        jsonOptions: {
-          duration: 0,
-          maxInitialScale: 5,
-        },
-      }) +
-      `
-<style>
-  body, #mindmap {
-    width: 2400px;
-    height: 1800px;
-  }
-</style>
-`;
-
-    const imageBuffer = await nodeHtmlToImage({
-      html,
-      puppeteer,
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, // 👈 passed from GitHub Action
-      puppeteerArgs: ['--no-sandbox'],
-      type: 'png',
-      encoding: 'buffer',
-    });
-
-    await writeFile(outPath, imageBuffer);
-    console.log(`✅ PNG saved to: ${outPath}`);
-  } catch (err) {
-    console.error('❌ Error rendering Markmap image:', err);
+  if (!htmlFilePath || !outputPngPath) {
+    console.error('Usage: node export-markmap-image.js <html_file_path> <output_png_path>');
     process.exit(1);
   }
-}
 
-const markdownFile = path.resolve('02-data-analysis/mindmap.md');
-const outputImage = path.resolve('02-data-analysis/img/mindmap.png');
+  const absoluteHtmlPath = path.resolve(htmlFilePath);
 
-renderMarkmap(markdownFile, outputImage);
+  // Launch a headless browser
+  // The '--no-sandbox' flag is required to run in a container like GitHub Actions
+  const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+  const page = await browser.newPage();
+
+  // Open the local HTML file
+  await page.goto(`file://${absoluteHtmlPath}`, { waitUntil: 'networkidle0' });
+
+  // Find the <svg> element which contains the Markmap visualization
+  const svgElement = await page.waitForSelector('svg');
+
+  // Take a screenshot of just the SVG element
+  if (svgElement) {
+    await svgElement.screenshot({
+      path: outputPngPath,
+      omitBackground: true, // Make the background transparent
+    });
+    console.log(`Screenshot saved to ${outputPngPath}`);
+  } else {
+    console.error('Could not find the SVG element to screenshot.');
+    process.exit(1);
+  }
+
+  // Close the browser
+  await browser.close();
+})();
