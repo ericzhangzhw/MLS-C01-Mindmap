@@ -1,9 +1,9 @@
-// scripts/export-markmap-image.js
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Transformer } from 'markmap-lib';
 import { fillTemplate } from 'markmap-render';
 import nodeHtmlToImage from 'node-html-to-image';
+import puppeteer from 'puppeteer';
 
 async function renderMarkmap(mdPath, outPath) {
   try {
@@ -31,10 +31,9 @@ async function renderMarkmap(mdPath, outPath) {
 
     const imageBuffer = await nodeHtmlToImage({
       html,
+      puppeteer,
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, // 👈 passed from GitHub Action
       puppeteerArgs: ['--no-sandbox'],
-      puppeteer: {
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
-      },
       type: 'png',
       encoding: 'buffer',
     });

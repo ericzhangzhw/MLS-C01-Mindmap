@@ -10,3 +10,4 @@ markmap:
 - mean
 - median
 - KNN imputation
+- other
