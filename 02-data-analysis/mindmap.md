@@ -11,3 +11,4 @@ markmap:
 - median
 - KNN imputation
 - Test
+- Other
