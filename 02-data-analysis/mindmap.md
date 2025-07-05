@@ -1,6 +1,8 @@
 ---
-mindmap:
-  colorFreezeLevel: 1
+title: markmap
+markmap:
+  colorFreezeLevel: 2
+  initialExpandLevel: 4
 ---
 
 # Certification Exam Refresher
