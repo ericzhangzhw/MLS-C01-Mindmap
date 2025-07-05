@@ -15,15 +15,11 @@ jobs:
       contents: write
 
     strategy:
-      # This ensures jobs run one-by-one, preventing git push conflicts.
-      # fail-fast: false means if one mindmap fails, the others will still run.
       fail-fast: false
       matrix:
         map_dir: [ '02-data-analysis', '03-modeling' ]
 
     steps:
-      # The checkout action now fetches the full history, which can help
-      # the git commands be more reliable.
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -37,6 +33,11 @@ jobs:
       - name: Install Dependencies
         run: npm install markmap-cli puppeteer
 
+      # --- THIS IS THE NEW FIX ---
+      # Create the 'img' subdirectory inside the mindmap's folder.
+      - name: Create output directory
+        run: mkdir -p ${{ matrix.map_dir }}/img
+
       - name: Generate HTML from ${{ matrix.map_dir }}/mindmap.md
         run: npx markmap-cli --no-open ${{ matrix.map_dir }}/mindmap.md -o ${{ matrix.map_dir }}/img/mindmap.html
 
@@ -45,7 +46,6 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          # Pull latest changes to avoid push conflicts from other jobs
           git pull
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
