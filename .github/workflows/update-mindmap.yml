@@ -1,24 +1,34 @@
-name: Update Mindmap PNG
+name: Update Mindmap PNGs
 
 on:
   push:
     branches:
-      - main # Or master, or your default branch
+      - main
     paths:
-      - '02-data-analysis/mindmap.md'
+      - '**/mindmap.md'
 
 jobs:
   build-mindmap:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write # Required to push the new PNG to the repo
+      contents: write
+
+    strategy:
+      # This ensures jobs run one-by-one, preventing git push conflicts.
+      # fail-fast: false means if one mindmap fails, the others will still run.
+      fail-fast: false
+      matrix:
+        map_dir: [ '02-data-analysis', '03-modeling' ]
 
     steps:
+      # The checkout action now fetches the full history, which can help
+      # the git commands be more reliable.
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # The 'cache' line has been removed from this step
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -27,20 +37,22 @@ jobs:
       - name: Install Dependencies
         run: npm install markmap-cli puppeteer
 
-      - name: Generate HTML from mindmap.md
-        run: npx markmap-cli --no-open 02-data-analysis/mindmap.md -o 02-data-analysis/img/mindmap.html
+      - name: Generate HTML from ${{ matrix.map_dir }}/mindmap.md
+        run: npx markmap-cli --no-open ${{ matrix.map_dir }}/mindmap.md -o ${{ matrix.map_dir }}/img/mindmap.html
 
-      - name: Generate PNG from HTML
-        run: node .github/scripts/export-markmap-image.js 02-data-analysis/img/mindmap.html 02-data-analysis/img/mindmap.png
+      - name: Generate PNG from HTML for ${{ matrix.map_dir }}
+        run: node .github/scripts/export-markmap-image.js ${{ matrix.map_dir }}/img/mindmap.html ${{ matrix.map_dir }}/img/mindmap.png
 
-      - name: Commit and push PNG
+      - name: Commit and push changes
         run: |
+          # Pull latest changes to avoid push conflicts from other jobs
+          git pull
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add 02-data-analysis/img/mindmap.png 02-data-analysis/img/mindmap.html
+          git add ${{ matrix.map_dir }}/img/mindmap.png ${{ matrix.map_dir }}/img/mindmap.html
           if git diff --staged --quiet; then
-            echo "No changes to commit."
+            echo "No changes to commit for ${{ matrix.map_dir }}."
           else
-            git commit -m "chore: Auto-generate mindmap assets"
+            git commit -m "docs(mindmap): Auto-generate assets for ${{ matrix.map_dir }}"
             git push
           fi
