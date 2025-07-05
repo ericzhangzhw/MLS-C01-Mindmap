@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        map_dir: [ '02-data-analysis', '03-modeling' ]
+        map_dir: [ '01-data-engineering', 02-data-analysis', '03-modeling' ]
 
     steps:
       - name: Checkout repository

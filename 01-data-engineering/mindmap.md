@@ -1,0 +1,175 @@
+---
+title: markmap
+markmap:
+  colorFreezeLevel: 2
+  initialExpandLevel: 4
+  maxWidth: 300
+  spacingHorizontal: 50
+---
+
+# AWS ML Specialty - Course Recap
+
+- ## Section 2 Recap: Data Storage & Movement
+  - ### The Data Story
+    - Data Collection & Ingestion
+    - Transformation
+    - Data Movement
+    - Leverage **Amazon SageMaker** for all components
+    - Automation
+    - #### Key Exam Concept
+      - What service to use for each step and why?
+      - e.g., SageMaker + S3
+  - ### Storage in AWS (Exam Focus)
+    - **Amazon S3** (Heaviest Focus)
+    - **Amazon S3 Glacier**
+    - **Amazon EBS** (Elastic Block Store)
+    - **Amazon EFS** (Elastic File System)
+  - ### Amazon S3 Deep Dive
+    - #### Core Concepts
+      - **Buckets**: Directories
+      - **Objects**: Files
+      - **Keys**: Full path to the file
+    - #### S3 Storage Classes (6 types)
+      - Based on access frequency
+      - **S3 Standard**: Most frequent access
+      - **S3 Glacier Deep Archive**: Least frequent access
+      - ##### Glacier & Glacier Deep Archive
+        - **180-day minimum** storage charge
+    - #### S3 Data Privacy & Security
+      - **Data in Transit**
+        - Moving between places
+        - Use **SSL/TLS**
+      - **Data at Rest** (Server-Side Encryption - SSE)
+        - **SSE-S3**: Fully managed by AWS
+        - **SSE-KMS**: AWS managed + you manage keys via Key Management Service
+        - **SSE-C**: You manage the keys entirely
+      - **Client-Side Encryption**
+      - **Access Controls & Audit Trails**
+  - ### Comparing Storage Platforms
+    - #### S3 vs. EFS
+      - **Large amounts of data**: S3
+      - **Hierarchical / File storage**: EFS
+      - **Simultaneous reads/writes**: EFS
+      - **Cost efficiency**: S3
+    - #### Adding EBS to the Mix
+      - **Pre-processing on a local disk**: EBS (tied to a single EC2 instance)
+      - **Low latency requirements**: EBS
+      - **High IOPS requirements**: EBS (up to 100,000 IOPS)
+      - **Shared file system**: EFS (reiteration)
+  - ### Key Takeaways for the Exam
+    - Data storage location is a critical decision.
+    - Understand **when** to choose each storage option (S3 vs. EBS vs. EFS).
+    - Understand the basics of S3 storage classes (speed/access frequency).
+    - **Expect these topics to be on the exam!**
+
+- ## Section 3 Recap: Data Processing
+  - ### Batch vs. Stream Processing
+    - #### Batch Processing
+      - Data **not** required immediately
+      - Ideal for large transformations
+      - Lower cost
+      - Better for larger data sources
+    - #### Stream Processing
+      - Data needed **right now** (e.g., fraud detection)
+      - Less complex transformations
+      - Higher cost
+  - ### Amazon Kinesis: Data Streams vs. Data Firehose
+    - #### Kinesis Data Streams
+      - **Use Case**: More complex solutions, larger transformations
+      - **Management**: Mostly managed
+      - **Data Storage**: Yes (1-7 days)
+      - **Processing Speed**: Real-time
+      - **Consumers**: Better for multiple consumers/destinations
+      - **Integration**: Supports Spark
+    - #### Kinesis Data Firehose
+      - **Use Case**: Simpler needs, moving data into a system
+      - **Management**: Fully managed
+      - **Data Storage**: No
+      - **Processing Speed**: Near real-time
+      - **Consumers**: Managed by Firehose
+      - **Integration**: Does not support Spark
+    - #### Core Idea
+      - **High Complexity** -> Kinesis Data Streams
+      - **Low Complexity** -> Kinesis Data Firehose
+  - ### AWS Glue & Glue Crawler
+    - #### Glue Crawler's Role
+      - Crawls through your data stores
+      - Helps populate your AWS Glue Data Catalog
+      - Can be run via Glue Jobs
+  - ### Exam Strategy
+    - #### Distractor Services
+      - Be aware of services mentioned that are **not** core to the exam.
+      - Know what they are, but focus on core services.
+  - ### Key Takeaways
+    - Know more than just the *concepts* of batch vs. streaming.
+    - Understand which **service** is the right fit.
+      - **Glue vs. Kinesis** is a critical distinction.
+    - Understand the labs to gain hands-on comfort with the services.
+
+- ## Section 4 Recap: ETL, ELT & Big Data Frameworks
+  - ### ETL (Extract, Transform, Load)
+    - #### Process
+      1. **Extract**: Get **all** of the data.
+      2. **Transform**: Process **all** of the data at once.
+      3. **Load**: Load the final, transformed data into the destination system.
+    - Used for things like reporting.
+  - ### ELT (Extract, Load, Transform)
+    - #### Process
+      1. **Extract**: Get the raw data.
+      2. **Load**: Load unprocessed data into a staging area (e.g., Data Lake).
+      3. **Transform**: Process **only the specific bits of data needed** for a usable report or output.
+    - Often associated with a **Data Lake** architecture, which may have multiple stages.
+  - ### Services for ETL/ELT (Exam Focus)
+    - #### Extract
+      - **AWS Glue** (using Glue Crawler)
+      - **Amazon Kinesis**
+    - #### Transform
+      - **Amazon EMR** (Primary focus for the exam)
+      - *Amazon Redshift* (Mentioned, but not on the exam)
+    - #### Load
+      - **Amazon S3** (Primary focus for the exam)
+      - *EFS / EBS*
+  - ### Amazon EMR (Elastic MapReduce)
+    - **Purpose**: Simplifies big data frameworks like **Spark** & **Hadoop**.
+    - **Framework**: Managed on a Hadoop framework, uses **EC2** for processing.
+    - **Use Cases**: Transformations, Analysis, Visualizations.
+    - **Key Benefit**: **Ease of Use**.
+  - ### Apache Spark Core Components
+    - **Concept**: A job execution engine.
+    - #### Architecture
+      - **Driver**: The "big brain" that coordinates the job.
+      - **Cluster Manager**: Manages resources.
+      - **Worker Nodes**:
+        - Contain **Executors**.
+        - Executors run individual **Tasks** in parallel.
+    - #### Key Concepts
+      - **RDDs** (Resilient Distributed Datasets)
+        - *Immutable* (unchangeable) collections of data.
+        - *Fault-tolerant*.
+      - **Lazy Transformations**
+        - Transformations are only processed when an **Action** is called.
+        - Allows for process ordering and streamlining, leading to faster execution.
+  - ### Apache Flink
+    - **Processing Types**: Handles both **streaming** and **batch** data.
+    - **Use Cases**: Big data processing, machine learning, real-time analytics.
+    - **Architecture**: Client, Job Manager, Task Managers.
+    - #### Key Time Concepts
+      - **Event Time**: When the event *actually happens* (e.g., a sale is made).
+      - **Processing Time**: When the data is processed by the system.
+      - **Watermark**: Tracks progress and helps handle late-arriving events.
+    - **Key Feature**: **Open Source**, allowing deep customization but requires more work than EMR.
+  - ### Hadoop & Hive (High-Level)
+    - **Hadoop**: Open-source framework for distributed processing of very large datasets.
+      - Uses **HDFS** (Hadoop Distributed File System).
+      - Uses **MapReduce** process:
+        - **Map**: Filtering and processing the data.
+        - **Reduce**: Aggregating the results for an output.
+    - **Hive**: Data warehousing software built on top of Hadoop.
+  - ### Summary & Key Takeaways for Exam
+    - Understand the difference between **ETL** and **ELT**.
+    - Know the associated services for each step.
+    - **Main Focus**:
+      - **Flink**
+      - **EMR**
+    - **High-Level Concepts Only**:
+      - **Hadoop, Hive, Spark** (Don't get lost in the weeds).
