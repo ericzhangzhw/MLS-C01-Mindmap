@@ -4,10 +4,7 @@ markmap:
   colorFreezeLevel: 2
   initialExpandLevel: 4
   maxWidth: 300
----
----
-mindmap:
-  initialExpandLevel: 1
+  spacingHorizontal: 50
 ---
 
 # Certification Exam Refresher
