@@ -1,4 +1,3 @@
----
 title: markmap
 markmap:
   colorFreezeLevel: 2
@@ -163,56 +162,77 @@ markmap:
     - Leverages an expert workforce managed by AWS.
     - Promoted as a simpler, cost-effective solution for high-quality training datasets.
 
-## Task Statement 2.2: Feature Engineering
+## Task Statement 2.2: Perform Feature Engineering
 
-### 1. Identify & Extract Features
-- **Feature Engineering**: Selection, Extraction, & Transformation
-- **Feature Types**
-  - **Qualitative**: Nominal, Ordinal, Boolean
-  - **Quantitative**: Discrete, Continuous
+### 1. What is Feature Engineering?
+- **Definition**: Selecting, extracting, & transforming variables from raw data to effectively train a model.
+- **Core Concepts**
+  - **Feature Selection**
+    - **Definition**: Choosing a subset of relevant features.
+    - **Goals**: Improve performance, reduce computational cost, enhance interpretability.
+    - **Example**: Removing 'Owner Name' for house price prediction.
+  - **Feature Extraction**
+    - **Definition**: Creating new features from existing ones.
+    - **Goals**: Provide more relevant info, reduce dimensionality.
+    - **Example**: Creating 'cost per sq ft' from 'price' & 'total sq ft'.
+  - **Feature Transformation**
+    - **Definition**: Converting features to a more suitable representation for models.
+    - **Goals**: Mitigate data skewness, handle differing scales.
+    - **Example**: Log transform on house prices.
+- **Challenges**
+  - Requires deep **domain understanding**.
+  - Time-consuming and resource-intensive process.
+  - No one-size-fits-all approach; requires mastery of various techniques.
+- **Value Proposition**
+  - Mitigates risk of overfitting and improves generalization.
+  - Captures underlying data patterns for better predictions.
+  - Helps business stakeholders make better decisions.
+
+### 2. Identifying Feature Types
+- **Qualitative (Categorical)**
+  - **Nominal**: No inherent order (e.g., heating type: gas, electric).
+  - **Ordinal**: Clear order or ranking (e.g., house quality: poor, fair, good).
+  - **Boolean**: Binary value (e.g., on sale: yes/no).
+- **Quantitative (Numerical)**
+  - **Discrete**: Countable items (e.g., # of bedrooms).
+  - **Continuous**: Infinite values within a range (e.g., price, sq ft).
+
+### 3. Feature Engineering Techniques
 - **Text Feature Extraction**
-  - **Bag of Words**
-  - **N-gram**
-  - **TF-IDF**: Measures word occurrence & frequency
+  - **Bag of Words**: Counts word frequency.
+  - **N-gram**: Captures word sequences.
+  - **TF-IDF**: Measures word importance in a corpus.
     - TF: $\frac{\text{Term occurrences in doc}}{\text{Total terms in doc}}$
     - IDF: $\log\left(\frac{\text{Total # of docs}}{\text{# of docs with term} + 1}\right)$
-    - Higher value means more significant term
-  - **Word Embedding**: Captures context, semantic & syntactic similarity
-    - CBoW (Continuous Bag of Words)
-    - Skip-gram
-    - Stemming
+  - **Word Embedding**: Captures context and semantic meaning (CBoW, Skip-gram).
 - **Image Feature Extraction**
-  - **Traditional CV**
-    - Grayscale pixel values (0-255)
-    - Mean Pixel Value of Channels (R, G, B)
-    - Prewitt Kernels (edge detection)
-  - **Deep Learning Techniques**
-
-### 2. Analyze & Evaluate Feature Engineering Concepts
-- **Feature Scaling**: Gives same weightage to all features
-  - **StandardScaler (Z-score)**: Assumes normal distribution
-  - **MinMaxScaler**: Scales data (e.g., between 0 and 1). Formula: $\frac{X - X_{min}}{X_{max} - X_{min}}$
-- **Feature Transformation**: Effective against skewed data
-  - Strategies: Box-Cox, Polynomial, Exponential
-- **Data Binning**: Converts continuous variables to discrete
+  - **Traditional CV**: Grayscale values, Mean Pixel Value, Prewitt Kernels (edges).
+  - **Deep Learning**: Uses layers of neural networks.
+- **Feature Scaling** (Gives features equal weight)
+  - **StandardScaler (Z-score)**: For normally distributed data.
+  - **MinMaxScaler**: Scales data to a range (e.g., 0 to 1). Formula: $\frac{X - X_{min}}{X_{max} - X_{min}}$
+- **Feature Transformation** (Handles skewed data)
+  - Strategies: Box-Cox, Polynomial, Exponential.
+- **Data Binning** (Continuous to discrete)
   - **Equal-width**: $\frac{\text{range}}{\text{# of bins}}$
   - **Equal-frequency**: $\frac{\text{# of elements}}{\text{total # of bins}}$
-  - **Other**: K-means binning, Decision tree binning
-- **Encoding**: Converts categorical data to numerical
-  - **Ordinal Encoding**: For ordinal data
-  - **One-Hot Encoding**: For nominal data
-  - **Binary Encoding**: For features with many categories
-- **Dimensionality Reduction**: Reduces feature count with minimal info loss
-  - **Feature Selection**: Selects a subset of features
-    - **Filter method**: Filters a subset
-    - **Wrapper method**: Uses ML model performance
-    - **Embedded method**: Integrated into model training
-  - **Feature Extraction**: Transforms features to a lower-dimensional space
+  - **Other**: K-means binning, Decision tree binning.
+- **Encoding** (Categorical to numerical)
+  - **Ordinal Encoding**: For ordinal data.
+  - **One-Hot Encoding**: For nominal data.
+  - **Binary Encoding**: For nominal data with many categories.
+- **Dimensionality Reduction**
+  - **Feature Selection**: Selects a subset of original features.
+    - **Filter method**: Based on statistical measures.
+    - **Wrapper method**: Uses ML model performance.
+    - **Embedded method**: Integrated into model training.
+  - **Feature Extraction**: Transforms features to a lower-dimensional space.
     - **Linear**: e.g., PCA (Principal Component Analysis)
     - **Non-linear**
-- **Amazon SageMaker Preprocessing**
-  - **SKLearnProcessor**: Run scikit-learn scripts as jobs
-  - **PySparkProcessor**: Run PySpark scripts as jobs
+
+### 4. Amazon SageMaker Preprocessing
+- **SKLearnProcessor**: Run scikit-learn scripts as processing jobs.
+- **PySparkProcessor**: Run PySpark scripts as processing jobs.
 
 ---
 
