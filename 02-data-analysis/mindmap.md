@@ -1,3 +1,4 @@
+---
 title: markmap
 markmap:
   colorFreezeLevel: 2
@@ -198,37 +199,106 @@ markmap:
   - **Continuous**: Infinite values within a range (e.g., price, sq ft).
 
 ### 3. Feature Engineering Techniques
-- **Text Feature Extraction**
-  - **Bag of Words**: Counts word frequency.
-  - **N-gram**: Captures word sequences.
-  - **TF-IDF**: Measures word importance in a corpus.
-    - TF: $\frac{\text{Term occurrences in doc}}{\text{Total terms in doc}}$
-    - IDF: $\log\left(\frac{\text{Total # of docs}}{\text{# of docs with term} + 1}\right)$
-  - **Word Embedding**: Captures context and semantic meaning (CBoW, Skip-gram).
-- **Image Feature Extraction**
-  - **Traditional CV**: Grayscale values, Mean Pixel Value, Prewitt Kernels (edges).
-  - **Deep Learning**: Uses layers of neural networks.
-- **Feature Scaling** (Gives features equal weight)
-  - **StandardScaler (Z-score)**: For normally distributed data.
-  - **MinMaxScaler**: Scales data to a range (e.g., 0 to 1). Formula: $\frac{X - X_{min}}{X_{max} - X_{min}}$
-- **Feature Transformation** (Handles skewed data)
-  - Strategies: Box-Cox, Polynomial, Exponential.
-- **Data Binning** (Continuous to discrete)
-  - **Equal-width**: $\frac{\text{range}}{\text{# of bins}}$
-  - **Equal-frequency**: $\frac{\text{# of elements}}{\text{total # of bins}}$
-  - **Other**: K-means binning, Decision tree binning.
-- **Encoding** (Categorical to numerical)
-  - **Ordinal Encoding**: For ordinal data.
-  - **One-Hot Encoding**: For nominal data.
-  - **Binary Encoding**: For nominal data with many categories.
-- **Dimensionality Reduction**
-  - **Feature Selection**: Selects a subset of original features.
-    - **Filter method**: Based on statistical measures.
-    - **Wrapper method**: Uses ML model performance.
-    - **Embedded method**: Integrated into model training.
-  - **Feature Extraction**: Transforms features to a lower-dimensional space.
-    - **Linear**: e.g., PCA (Principal Component Analysis)
-    - **Non-linear**
+- #### In-Depth: Text Feature Extraction
+  - **Goal**: Convert raw text into a structured, numerical format.
+  - **Preprocessing is crucial**: Lowercase, remove punctuation & stop words.
+  - **Techniques**
+    - **Bag of Words (BoW)**
+      - **Process**: Tokenizes text and measures frequency of words in a document.
+      - **Key Trait**: Ignores word order and sequence.
+      - **Scoring**: Binary (presence), Count, or Frequency.
+      - **Limitation**: High dimensionality for large vocabularies.
+    - **N-gram**
+      - **Process**: Builds on BoW to capture groups of 'N' consecutive words.
+      - **Unigram (N=1)** is the same as BoW.
+      - **Bigram (N=2)** considers pairs of words.
+    - **Limitations of BoW & N-gram**
+      - Cannot capture context or semantic meaning.
+      - Suffer from out-of-vocabulary words.
+      - Can be computationally expensive.
+    - **TF-IDF (Term Frequency-Inverse Document Frequency)**
+      - **What is it?**: Statistical measure of a word's importance to a document in a corpus.
+      - **Formula**: TF-IDF Score = TF * IDF
+      - **TF**: $\frac{\text{Term occurrences in doc}}{\text{Total terms in doc}}$
+      - **IDF**: $\log\left(\frac{\text{Total \# of docs}}{\text{\# of docs with term} + 1}\right)$
+      - **High Score**: Word is important to that specific document.
+      - **Low Score**: Word is common across many documents (less important).
+    - **Word Embedding**
+      - **What is it?**: Represents words as dense numerical vectors, capturing context, semantic & syntactic similarity.
+      - **Techniques**
+        - **CBoW (Continuous Bag of Words)**: Predicts a target word from its context.
+        - **Skip-gram**: Predicts context words from a target word. Effective for word similarity tasks.
+    - **Stemming**
+      - **What is it?**: Reduces words to their root form (e.g., "learning" -> "learn").
+      - **Purpose**: Normalizes words to reduce the number of unique words.
+- **Image Feature Extraction**: Traditional CV, Deep Learning.
+- #### In-Depth: Feature Scaling
+  - **Why?** To prevent models from being influenced by features with larger scales (e.g., salary vs. age).
+  - **Techniques**
+    - **StandardScaler (Z-score)**
+      - Scales data to a mean of 0 and std dev of 1.
+      - Formula: $z = \frac{x - \mu}{\sigma}$
+      - **Assumption**: Data is normally distributed.
+    - **MinMaxScaler**
+      - Rescales data to a specific range (default is 0 to 1).
+      - Formula: $\frac{X - X_{min}}{X_{max} - X_{min}}$
+    - **MaxAbsScaler**
+      - Scales data to a range of -1 to 1 by dividing by the max absolute value.
+    - **RobustScaler**
+      - Removes median and scales using the Interquartile Range (IQR).
+      - **Recommended for data with outliers**.
+- #### In-Depth: Feature Transformation
+  - **Why?** To interpret non-linear relationships, reduce skewness, and uncover hidden patterns.
+  - **Techniques**
+    - **Logarithmic Transformation**
+      - Reduces the impact of very high values and makes data less skewed.
+    - **Box-Cox Transformation**
+      - Used when the target variable is skewed to convert it to a normal distribution.
+    - **Polynomial Transformation**
+      - Creates new features by raising original features to a power to capture non-linear relationships.
+    - **Exponential Transformation**
+      - Used for features exhibiting exponential growth or decay (e.g., stock prices).
+- #### In-Depth: Data Binning (Discretization)
+  - **What is it?** Transforming a continuous variable into discrete bins/intervals.
+  - **Benefits**
+    - Can improve performance for some ML algorithms (faster training).
+    - Reduces noise by grouping similar values.
+    - Helps address data skewness.
+  - **Drawbacks**
+    - **Information Loss**: Fine-grained details can be lost.
+    - **Bias**: Inappropriate bin sizes can introduce bias.
+  - **Binning Strategies**
+    - **Equal-Width (Uniform)**
+      - Bins have the same width. Formula: $\frac{\text{range}}{\text{\# of bins}}$
+      - Best for symmetric, evenly distributed data.
+    - **Equal-Frequency (Quantile)**
+      - Bins have the same number of observations.
+      - Best for skewed datasets or those with outliers.
+    - **K-Means Binning**
+      - Uses K-Means clustering to partition data.
+      - Good for non-uniform data distributions.
+    - **Decision-Tree Binning**
+      - Uses a decision tree to find optimal split points.
+      - Effective for non-linear relationships.
+  - **Implementation**: `scikit-learn`'s **KBinDiscretizer**.
+- #### In-Depth: Encoding Categorical Data
+  - **What is it?** Transforming categorical data into numerical data.
+  - **Importance**
+    - **Algorithm Compatibility**: Most ML models require numerical input.
+    - **Improve Model Quality**: Helps algorithms learn patterns.
+    - **Prevent Bias**: Ensures equal feature weightage.
+  - **Encoding Ordinal Features** (Data with clear order)
+    - **OrdinalEncoder**: Assigns integers respecting the order (e.g., `Developer:1`, `Manager:3`).
+    - **LabelEncoder**: Also assigns integers, but does not guarantee order (encodes alphabetically). Order can be manually set.
+  - **Encoding Nominal Features** (Data with no order)
+    - **One-Hot Encoding**
+      - Creates a new binary (0/1) column for each category.
+      - **Best for**: Features with a low number of unique categories.
+      - **Drawbacks**: Can lead to high dimensionality and sparse data.
+    - **Binary Encoding**
+      - Converts categories to integers, then to binary digits, then splits binary digits into columns.
+      - **Best for**: Features with a high number of unique categories (high cardinality).
+- **Dimensionality Reduction**: Feature Selection (Filter, Wrapper, Embedded), Feature Extraction (PCA).
 
 ### 4. Amazon SageMaker Preprocessing
 - **SKLearnProcessor**: Run scikit-learn scripts as processing jobs.
