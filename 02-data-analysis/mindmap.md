@@ -195,7 +195,7 @@ markmap:
   - **Ordinal**: Clear order or ranking (e.g., house quality: poor, fair, good).
   - **Boolean**: Binary value (e.g., on sale: yes/no).
 - **Quantitative (Numerical)**
-  - **Discrete**: Countable items (e.g., # of bedrooms).
+  - **Discrete**: Countable items (e.g., \# of bedrooms).
   - **Continuous**: Infinite values within a range (e.g., price, sq ft).
 
 ### 3. Feature Engineering Techniques
@@ -231,7 +231,25 @@ markmap:
     - **Stemming**
       - **What is it?**: Reduces words to their root form (e.g., "learning" -> "learn").
       - **Purpose**: Normalizes words to reduce the number of unique words.
-- **Image Feature Extraction**: Traditional CV, Deep Learning.
+- #### In-Depth: Image & Speech Feature Extraction
+  - **From Images**
+    - **How computers see images**: Raster graphics (pixel grids).
+    - **Categories**
+      - **Traditional Computer Vision**: Pixel intensity, edge detection.
+      - **Deep Learning**: CNNs, Transfer Learning (more compute-intensive).
+    - **Traditional CV Techniques**
+      - **Grayscale Pixel Value**: Each pixel (0-255) is a feature. Captures brightness, contrast.
+      - **Mean Pixel Value of Channels**: Averages R, G, B channels of color images to reduce feature count.
+      - **Edge Features**: Identifies object edges using sharp changes in pixel values, often with a **Prewitt Kernel**.
+  - **From Speech**
+    - **Goal**: Convert raw audio signal into representative feature vectors.
+    - **Challenges**
+      - Varies by gender, age, emotion.
+      - Background noise.
+      - High-dimensionality.
+    - **Techniques**
+      - **Traditional**: MFCC (Mel Frequency Cepstral Coefficient), LPC (Linear Predictive Coding).
+      - **Deep Learning**: LSTM (Long Short-Term Memory), GRU (Gated Recurrent Unit).
 - #### In-Depth: Feature Scaling
   - **Why?** To prevent models from being influenced by features with larger scales (e.g., salary vs. age).
   - **Techniques**
@@ -298,7 +316,30 @@ markmap:
     - **Binary Encoding**
       - Converts categories to integers, then to binary digits, then splits binary digits into columns.
       - **Best for**: Features with a high number of unique categories (high cardinality).
-- **Dimensionality Reduction**: Feature Selection (Filter, Wrapper, Embedded), Feature Extraction (PCA).
+- #### In-Depth: Dimensionality Reduction
+  - **The "Curse of Dimensionality"**: More features can increase complexity and sparsity, harming model generalization.
+  - **Definition**: Reducing the number of features while minimizing information loss.
+  - **Benefits**: Saves costs, improves model performance & interpretability, helps avoid overfitting.
+  - **Main Categories**
+    - **1. Feature Selection**
+      - **Goal**: Select a subset of original features.
+      - **Methods**
+        - **Filter Method**: Selects based on statistical measures (e.g., Variance Threshold, Chi-square Test).
+        - **Wrapper Method**: Uses ML model performance to evaluate subsets (e.g., Forward Selection, Backward Elimination). *Computationally intensive*.
+        - **Embedded Method**: Feature selection is part of model training (e.g., Lasso/Ridge Regression, Gradient Boosting).
+    - **2. Feature Extraction**
+      - **Goal**: Transform features into a new, lower-dimensional space.
+      - **Methods**
+        - **Linear**: PCA (Principal Component Analysis), LDA (Linear Discriminant Analysis).
+        - **Non-linear**: t-SNE, Isometric Mapping.
+  - **Deep Dive: Principal Component Analysis (PCA)**
+    - **Process Overview**:
+      1. Standardize the data.
+      2. Compute the covariance matrix.
+      3. Compute eigenvalues and eigenvectors.
+      4. Select top 'k' eigenvectors (principal components).
+      5. Transform data into the new, lower-dimensional space.
+    - **Easier Method**: Use the `PCA` library from `scikit-learn`.
 
 ### 4. Amazon SageMaker Preprocessing
 - **SKLearnProcessor**: Run scikit-learn scripts as processing jobs.
