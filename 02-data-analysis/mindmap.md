@@ -342,58 +342,94 @@ markmap:
     - **Easier Method**: Use the `PCA` library from `scikit-learn`.
 
 ### 4. Amazon SageMaker Preprocessing
-- **SKLearnProcessor**: Run scikit-learn scripts as processing jobs.
-- **PySparkProcessor**: Run PySpark scripts as processing jobs.
+- **Challenges of Preprocessing**: Resource availability, tool setup, reusability.
+- **How SageMaker Helps**: Pay-as-you-go, integrated environment, flexible, reproducible.
+- **Definition**: Run data pre/post-processing, feature engineering, and model evaluation on SageMaker's fully-managed infrastructure.
+- **Architecture**
+  1. Raw data in **S3**.
+  2. Fed into a **SageMaker Processing Job** (in a container).
+  3. Job runs a script to perform preprocessing.
+  4. Processed data is returned to **S3**.
+- **Processor Options**
+  - **SKLearnProcessor**: To run scikit-learn scripts.
+  - **PySparkProcessor**: To run PySpark scripts.
+- **Implementation Walkthrough**
+  - Use a processor (`SKLearnProcessor`) to run a script (`preprocessing.py`).
+  - Specify the `instance_type` for the job (not the notebook).
+  - Use the `.run()` function to pass arguments and start the job.
+- **Common Errors & Troubleshooting**
+  - **`AccessDeniedException`**: IAM role lacks permissions. Fix by adding policies (e.g., `CloudWatchLogsReadOnlyAccessPolicy`).
+  - **`ResourceLimitExceeded`**: Account has a quota of 0 for the instance type. Fix by requesting a quota increase in **Service Quotas**.
 
 ---
 
-## Task Statement 2.3: Visualization & Analysis
+## Task Statement 2.3: Analyze & Visualize Data for ML
 
-### 1. Create Graphs (Visualization Techniques)
-- **Goal**: Understand when to use each technique to tell a story
-- **Visualizing Relationships**
-  - Uncovers patterns and trends
-  - **Scatterplots & Bubble Charts**: Plot features on X/Y axes (Bubble chart for 3+ features)
-- **Visualizing Data Distribution**
-  - Shows mean, median, skewness
-  - **Histogram, Boxplot, Heatmap**
-  - Boxplots are effective for identifying outliers
-- **Visualizing Comparisons**
-  - Static snapshot of how variables compare & change over time
-  - **Bar Charts & Line Charts**: Many variations available
-- **Visualizing Composition**
-  - Shows individual elements of the data
-  - **Pie Chart**: Effective for part-to-whole relationships
-  - **Stacked Bar Chart**
+### 1. Understanding Probability Distribution
+- **What is it?**: A function giving the probabilities of different possible outcomes.
+- **Value in ML**:
+  - Exploring data & finding hidden patterns.
+  - Expressing model uncertainty (e.g., Bayesian neural networks).
+  - Evaluating model fit (e.g., cross-validation).
+  - Core of techniques like Monte Carlo methods.
+- **Types of Distributions**
+  - #### Discrete Distributions (finite outcomes)
+    - **Bernoulli**: Single trial, two possible outcomes (e.g., one coin flip).
+    - **Binomial**: Multiple independent Bernoulli trials (e.g., N coin flips).
+    - **Poisson**: Probability of 'N' events in a specific time period, when the rate is known but timing is not (e.g., \# of calls per hour).
+  - #### Continuous Distributions (infinite outcomes)
+    - **Normal**: Symmetrical "bell-shaped curve" with no skew (e.g., student scores).
+    - **Log-Normal**: Represents the log values of normally distributed data (often used in finance).
+    - **Exponential**: Models the time elapsed *between* two events (e.g., time between calls).
 
-### 2. Descriptive Statistics
-- **Definition**: Collecting & interpreting data (vs. inferential statistics for prediction)
-- **Visualization-Specific Metrics**
-  - Skewness
-  - Kurtosis
-  - Correlation
+### 2. Visualization Techniques & Descriptive Statistics
+- #### Visualizing Relationships, Comparisons & Compositions
+  - **Bar Charts**: For comparing *categorical* data. Can be clustered to compare multiple series.
+  - **Line Charts**: For showing how data changes over *time*. Can compare trends for multiple categories.
+  - **Scatter Plots**: For showing the relationship between two *numerical* features. Good for seeing correlation and outliers.
+  - **Bubble Charts**: Extends scatter plots to show a *third* numerical feature as the bubble size.
+  - **Pie Charts**: For showing part-to-whole relationships in data composition. Best for few categories.
+  - **Stacked Bar Charts**: For comparing totals while also showing the composition of each bar.
+  - **Heatmaps**: Represents numerical data tables using color intensity. Great for spotting patterns in large data.
+- #### Descriptive Statistics for Visualization
+  - **Goal**: Understand and describe the data (not make predictions).
+  - **Key Metrics for Visualization**
+    - **Skewness**: Measure of asymmetry in a distribution.
+      - **Negative (Left) Skew**: Tail is on the left; `mean < mode`.
+      - **Positive (Right) Skew**: Tail is on the right; `mean > mode`.
+    - **Kurtosis**: Measurement of outliers (extremity of tails).
+      - **Mesokurtic**: Normal distribution.
+      - **Leptokurtic**: Heavy tails (more outliers).
+      - **Platykurtic**: Thin tails (fewer outliers).
+    - **Correlation**: How strongly two features are related (`r` from -1 to +1).
 
 ### 3. Cluster Analysis
-- **Definition**: Statistical technique to group similar data points
-- **Use Case**: When a target variable is not identified
-- **Types**
-  - **K-Means Clustering (Partition)**
-    - Must specify the number of clusters (k)
-    - **Elbow Method**: Helps choose an optimal 'k'
-  - **Hierarchical Clustering**
-    - No need to specify cluster count
-    - Forms a **dendrogram** (tree-like structure)
-    - **Approaches**
-      - **Agglomerative (Bottom-up)**: Start with single points, merge based on similarity.
-        - **Linkage Methods**: Calculate distance (e.g., single linkage)
-      - **Divisive (Top-down)**: Start with one cluster, split based on dissimilarity.
-    - **Note**: Computationally intensive, high memory needs for large datasets.
-  - **Density-based Clustering**
+- **What is it?**: A statistical technique to group similar data points into clusters.
+- **Use Cases**: Market segmentation, customer grouping, anomaly/fraud detection.
+- **Main Categories**
+  - **Partitioning Clustering** (e.g., K-Means)
+    - User must specify the number of clusters (k).
+  - **Hierarchical Clustering** (e.g., Agglomerative)
+    - User does not need to specify the number of clusters. Creates a **dendrogram**.
+  - **Density-based Clustering** (e.g., DBSCAN)
+    - User does not need to specify cluster size; based on data point density.
+- #### In-Depth: K-Means & Elbow Method
+  - **K-Means Process**: Iteratively assigns points to the nearest centroid and recomputes the centroid.
+  - **Elbow Method (to find optimal 'k')**: Plot `k` vs. WCSS (Within-Cluster Sum of Squares); the "elbow" is the optimal `k`.
+- #### In-Depth: Hierarchical Clustering
+  - **Builds a Dendrogram** (tree-like structure).
+  - **Approaches**: Agglomerative (Bottom-up) & Divisive (Top-down).
+  - **Linkage Methods** (calculating distance): Single Linkage (shortest distance), Complete Linkage (maximum distance).
+  - **Caution**: Computationally expensive for large datasets.
 
-### 4. Amazon QuickSight
-- **Definition**: AWS BI tool to visualize and analyze data
-- **Features**
-  - Integrates with multiple data sources
-  - Supports many data formats
+### 4. Amazon QuickSight & ML Insights
+- **What is it?**: A serverless, self-service BI tool for data visualization and analysis.
+- **Core Features**:
+  - Integrates with many data sources (S3, Redshift, Salesforce, etc.).
+  - Uses **SPICE** (Super-fast, Parallel, In-memory Calculation Engine).
+  - Dashboards, Analyses, Sheets, and Visuals.
 - **ML Insights**
-  - A powerful feature for anomaly detection and forecasting using ML
+  - **Features**: ML-powered forecasting, Anomaly Detection, and Autonarratives.
+  - **Underlying Algorithm**: Random Cut Forest.
+  - **Data Requirements**: Needs at least one metric, one category, and a date dimension for forecasting/anomaly detection.
+  - **Autonarratives**: Customizable narratives to tell the story behind the data.
