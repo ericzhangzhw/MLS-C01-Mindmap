@@ -48,10 +48,10 @@ markmap:
         - **Reduced Overhead**: Manage one endpoint instead of many.
   - ### Model Testing in Production
     - #### **A/B Testing (Production Variants)**
-      - **Method**: Distribute traffic to multiple model versions on the same endpoint.
-      - **Configuration**: Assign a **weight** to each **production variant** (e.g., 20% to model A, 80% to model B).
-      - **Updating**: Weights can be updated without any application code changes.
-      - **Direct Invocation**: Call a specific model version using the `TargetVariant` parameter.
+      - **Concept**: Test different model versions behind the same endpoint. Variants can use different algorithms, datasets, or instance types.
+      - **Traffic Distribution Methods**:
+        - **Weight-based Routing**: Assign a **weight** to each variant in the endpoint configuration (e.g., 0.2 for 20%, 0.8 for 80%). Weights can be updated without application code changes.
+        - **Direct Invocation**: Invoke a specific model version by specifying the `TargetVariant` in the API call.
   - ### Service Quotas (Limits)
     - Limits exist on services (e.g., number of specific EC2 instances).
     - Can impact SageMaker jobs (e.g., Batch Transform).
@@ -100,45 +100,43 @@ markmap:
 
 - ## 3. MLOps, Monitoring & Governance
   - ### Monitoring vs. Auditing
-    - #### **Amazon CloudWatch (Monitoring)**
-      - **Purpose**: Monitors the **performance and health** of systems.
-      - **Metrics**: Collects near-real-time utilization metrics (CPU, Memory, GPU).
-      - **CloudWatch Logs**: Centralizes and stores log files.
-      - **CloudWatch Events (EventBridge)**: Responds to system events (e.g., training job completion).
+    - #### **Amazon CloudWatch (Infrastructure Monitoring)**
+      - **Purpose**: Monitors the **performance and health** of underlying resources (EC2 instances).
+      - **Metrics**: Collects near-real-time utilization metrics (CPU, Memory, GPU, Latency, Invocations).
       - **CloudWatch Alarms**: Sends notifications (via SNS/SES) when a metric breaches a threshold.
-    - #### **AWS CloudTrail (Auditing)**
+    - #### **AWS CloudTrail (API Auditing)**
       - **Purpose**: Provides a **governance and audit trail** of API calls.
-      - **What it logs**: Actions like `CreateTrainingJob`, `CreateModel`.
+      - **What it logs**: Actions like `CreateTrainingJob`, `CreateModel`, `UpdateEndpointWeights`.
       - **Long-term storage**: Create a **trail** to save logs indefinitely to an S3 bucket.
+  - ### Automation & Orchestration
+    - #### **Retraining Pipelines with AWS Step Functions**
+      - **Purpose**: A serverless orchestration tool to automate and visualize the entire ML workflow.
+      - **Benefits**:
+        - Automatically triggers and tracks each step.
+        - The output of one step becomes the input to the next.
+        - Logs the state of each step, making it easier to debug failures (e.g., service quota errors).
+    - #### **Custom Docker Containers & AMIs**
+      - **Custom Containers**: Use when a built-in algorithm doesn't fit your needs. Build and push to **Amazon ECR**.
+      - **Golden Images (AMIs)**: Ensures consistent configuration for manually managed EC2 instances.
+  - ### SageMaker Model Monitor (Model Performance)
+    - **Purpose**: Continuously monitor the quality and effectiveness of a deployed model, not the infrastructure.
+    - **How it Works**: Compares real-time predictions against a **baseline** generated from the training data.
+    - **Detects Drift In**:
+      - **Data Quality**: Production data distribution changes from training data.
+      - **Model Quality**: Core metrics (accuracy, precision, RMSE) degrade.
+      - **Bias**: The model's predictions become biased as production data changes.
+      - **Feature Attribution**: The relative importance of input features changes.
+    - Integrates with CloudWatch to send alerts when violations are detected.
   - ### SageMaker Algorithm Selection
     - #### **Supervised Learning**
-      - **Classification (Binary/Multi-class)**: Linear Learner, k-NN, XGBoost, Factorization Machines.
-      - **Regression**: Linear Learner, k-NN, XGBoost, Factorization Machines.
-    - #### **Time-Series Forecasting**
-      - **Algorithm**: DeepAR.
+      - **Classification/Regression**: Linear Learner, k-NN, XGBoost, Factorization Machines.
+    - #### **Time-Series Forecasting**: DeepAR.
     - #### **Unsupervised Learning**
       - **Anomaly Detection**: Random Cut Forest.
       - **Clustering**: K-Means.
-      - **Topic Modeling**: Latent Dirichlet Allocation (LDA), Neural Topic Model (NTM).
-    - #### **Text Analysis**
-      - **Text Classification**: BlazingText, Text Classification (TensorFlow).
-      - **Translation / Summarization / Speech-to-Text**: Seq2Seq.
-    - #### **Image & Computer Vision**
-      - **Image Classification**: Based on MXNet.
-      - **Object Detection**: Based on MXNet, TensorFlow.
-      - **Pixel-level Categorization**: Semantic Segmentation.
-  - ### Advanced Customization & Automation
-    - #### **Custom Docker Containers**
-      - **Use Case**: When a built-in algorithm doesn't fit your needs.
-      - **Process**: Build a Docker image with your custom code/packages and push it to **Amazon ECR**.
-    - #### **Golden Images (AMIs)**
-      - A pre-configured EC2 image (OS, software, scripts).
-      - Ensures consistency and is used with Auto Scaling.
-    - #### **Retraining Pipelines with AWS Step Functions**
-      - Orchestrate and automate the entire ML workflow.
-  - ### SageMaker Model Monitor
-    - **Purpose**: Continuously monitor a deployed model for drift.
-    - **Detects Drift In**: Data Quality, Model Quality, Bias, and Feature Attribution.
+      - **Topic Modeling**: LDA, NTM.
+    - #### **Text Analysis**: BlazingText, Seq2Seq.
+    - #### **Image & Computer Vision**: Image Classification, Object Detection, Semantic Segmentation.
 
 - ## 4. AWS AI/ML Service Landscape
   - ### The AWS Machine Learning Stack (3 Layers)
@@ -151,15 +149,15 @@ markmap:
       - **For**: Customers wanting to add intelligence to apps without building/training models.
   - ### High-Level AI Service Details
     - #### **Text & Document Analysis**
-      - **Textract**: Extracts text and structured data from documents (PDFs, images, forms) using OCR. Use for ID processing or invoice analysis.
-      - **Comprehend**: Uses NLP to discover insights in text. Performs sentiment analysis, identifies key phrases, topics, and language.
+      - **Textract**: Extracts text and structured data from documents using OCR.
+      - **Comprehend**: Uses NLP to discover insights in text (sentiment, key phrases, topics).
     - #### **Speech & Language**
-      - **Transcribe**: Speech-to-text service. Takes audio files or streams as input.
-      - **Translate**: Neural machine translation for large volumes of text or HTML. Supports over 70 languages.
-      - **Polly**: Text-to-speech service that generates natural-sounding audio.
-      - **Lex**: Builds conversational interfaces (chatbots) using natural language understanding (NLU).
+      - **Transcribe**: Speech-to-text.
+      - **Translate**: Neural machine translation.
+      - **Polly**: Text-to-speech.
+      - **Lex**: Builds conversational chatbots.
     - #### **Vision**
-      - **Rekognition**: Image and video analysis to detect objects, people, text, scenes, and activities.
+      - **Rekognition**: Image and video analysis.
     - #### **Forecasting & Fraud**
-      - **Forecast**: Time-series forecasting service. Uses historical data to predict future demand (e.g., for retail, staffing).
-      - **Fraud Detector**: Builds custom fraud detection models based on your historical data for low-latency, real-time online fraud prevention.
+      - **Forecast**: Time-series forecasting for demand planning.
+      - **Fraud Detector**: Builds custom fraud detection models for online fraud prevention.
