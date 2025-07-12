@@ -61,23 +61,42 @@ markmap:
 
 - ## 2. Security & Identity
   - ### Identity & Access Management (IAM)
+    - **Core Pillars**:
+      - **Users**: People or applications.
+      - **Groups**: Collections of users under one set of permissions.
+      - **Roles**: Assignable to users, applications, or services for temporary access.
+    - **Policies**: JSON documents that define one or more permissions.
+      - Attached to a user, group, or role.
+      - Can include **conditions** to limit access (e.g., require SSL via `aws:SecureTransport`).
     - **Principle of Least Privilege**: Grant only the permissions an entity needs to perform its function.
     - **SageMaker Execution Roles**: An IAM role that grants SageMaker permission to perform operations on your behalf.
-      - The default `AmazonSagemakerFullAccess` policy is broad; it's best practice to create restrictive, custom policies.
   - ### Data & Network Protection
     - #### **Amazon S3 Security**
-      - **Default**: All S3 buckets are **private**.
-      - **Bucket Policies**: Define fine-grained access permissions.
-      - **Conditions**: Enforce rules, like requiring HTTPS.
-    - #### **Encryption with AWS KMS**
-      - **How it works**: Uses **Envelope Encryption**.
-      - **Key Policies**: Control which users/roles can use keys.
-      - **Critical**: The SageMaker Execution Role **must** have `encrypt` and `decrypt` permissions for any customer-managed KMS key it needs to use.
-    - #### **VPC & Private Communication**
+      - **Default**: All newly created buckets are **private**.
+      - **Bucket Policies**: JSON documents used to `Allow` and `Deny` access to specific IAM roles/users at the bucket level.
+    - #### **Encryption**
+      - **In Transit**: Use SSL/TLS (HTTPS) to protect data moving across a network.
+      - **At Rest**: Protect data stored persistently.
+        - **S3 Options**: SSE-S3 (S3 managed keys), SSE-KMS (KMS managed keys), SSE-C (customer keys), Client-Side.
+        - **AWS KMS (Key Management Service)**
+          - **Envelope Encryption**: A Customer Master Key (CMK) encrypts a Data Key, which then encrypts your actual data.
+          - **Key Policies**: Control which users/roles can **administer** the key vs. which can **use** the key for encrypt/decrypt operations.
+          - **Critical for SageMaker**: The Execution Role **must** have `encrypt` and `decrypt` permissions for any customer-managed KMS key it needs to use.
+    - #### **Virtual Private Cloud (VPC)**
+      - **Concept**: A logical, isolated data center in AWS.
+      - **Subnets**:
+        - **Public**: Has a route to an **Internet Gateway** for public access.
+        - **Private**: No Internet Gateway; may have outbound internet via a **NAT Gateway**.
       - **VPC Endpoints (AWS PrivateLink)**: Enables **private and secure communication** between your VPC and AWS services. Traffic **never leaves the Amazon network**.
-  - ### Other Security Concepts
-    - **Data Anonymization**: Hashing values with Athena.
-    - **Security Groups**: Stateful virtual firewall for EC2 instances.
+    - #### **Security Groups**
+      - **Concept**: A **stateful** virtual firewall for EC2 instances.
+      - **Default State**: Denies all inbound traffic. You create `allow` rules.
+      - **Stateful**: If an inbound request is allowed, the outbound response is automatically allowed (and vice-versa).
+      - **Rule Components**: Protocol, Port Range, and Source/Destination.
+      - **Source/Destination**: Can be an IP, a network range, or another **Security Group ID**.
+  - ### Anonymization Best Practices
+    - **Use Case**: For sensitive data (PII) when fields cannot be removed.
+    - **Example Method**: Use **Amazon Athena** to run a SQL query that creates a **hash** (e.g., SHA-256) of the original values, disguising them.
 
 - ## 3. MLOps, Monitoring & Governance
   - ### Monitoring vs. Auditing
