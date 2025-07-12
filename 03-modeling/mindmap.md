@@ -429,18 +429,91 @@ markmap:
 
 ---
 
+---
+
+
 ## Task Statement 3.5: Model Evaluation
 
-### 1. Evaluate Metrics
-- **Classification**: Accuracy, Precision, Recall, F1 Score, AUC Curve.
-- **Regression**: MAE, MSE, RMSE.
+### 1. Interpret Confusion Matrices
+- **Purpose**: A table comparing actual vs. predicted values to evaluate a classification model. It's the basis for many metrics.
+- **Application**:
+  - **Binary Classification**: A 2x2 matrix (e.g., Spam vs. Not Spam).
+  - **Multiclass Classification**: An NxN matrix for N outcomes (e.g., a 3x3 matrix for Apple, Banana, Orange).
+- **Components**:
+  - **True Positive (TP)**: Correctly predicted positive class.
+  - **True Negative (TN)**: Correctly predicted negative class.
+  - **False Positive (FP) / Type 1 Error**: Incorrectly predicted positive class.
+  - **False Negative (FN) / Type 2 Error**: Incorrectly predicted negative class.
 
-### 2. Interpret Confusion Matrices
-- **Purpose**: A table showing the performance of a classification model.
-- **Components**: True Positive (TP), True Negative (TN), False Positive (FP), False Negative (FN).
+### 2. Evaluate Metrics
+- **Classification Metrics (from Confusion Matrix)**
+  - **Accuracy**
+    - **Definition**: `% of total correct predictions.`
+    - **Formula**: `(TP + TN) / (TP + TN + FP + FN)`
+    - **Use When**: The dataset is balanced.
+    - **Weakness**: Misleading for imbalanced datasets.
+  - **Precision**
+    - **Definition**: `What % of positive predictions were correct?`
+    - **Formula**: `TP / (TP + FP)`
+    - **Use When**: Minimizing False Positives is critical (e.g., spam detection).
+  - **Recall (Sensitivity / True Positive Rate)**
+    - **Definition**: `Of all actual positives, how many did we find?`
+    - **Formula**: `TP / (TP + FN)`
+    - **Use When**: Minimizing False Negatives is critical (e.g., disease screening).
+  - **Specificity (True Negative Rate)**
+    - **Definition**: `What % of negative cases were correctly predicted?`
+    - **Formula**: `TN / (TN + FP)`
+    - **Use When**: Correctly identifying negatives is crucial.
+  - **F1 Score**
+    - **Definition**: The harmonic mean of Precision and Recall.
+    - **Formula**: `2 * (Precision * Recall) / (Precision + Recall)`
+    - **Use When**: You need a balance between Precision & Recall, especially for imbalanced data.
+  - **ROC Curve & AUC**
+    - **ROC Curve**: Plots True Positive Rate vs. False Positive Rate.
+    - **AUC (Area Under the Curve)**: A single value summarizing the ROC curve; bigger is better.
+- **Regression Metrics**
+  - **Mean Absolute Error (MAE / L1 Loss)**
+    - **Definition**: Average of absolute differences between predicted and actual values.
+    - **Strength**: Not sensitive to outliers.
+  - **Mean Squared Error (MSE / L2 Loss)**
+    - **Definition**: Average of squared differences between predicted and actual values.
+    - **Characteristic**: Penalizes larger errors more; less interpretable units.
+  - **Root Mean Squared Error (RMSE)**
+    - **Definition**: Square root of MSE.
+    - **Strength**: Interpretable (same units as target).
+    - **Weakness**: Sensitive to outliers.
+  - **Mean Absolute Percentage Error (MAPE)**
+    - **Definition**: Average of absolute percentage differences.
+    - **Strength**: Relative error measure (%).
+    - **Weakness**: Sensitive to zero-values.
 
 ### 3. Online and Offline Model Evaluation
-- **Online Evaluation (A/B Testing)**: Assessing model performance on live data in production.
+- **Offline Evaluation**: Assessed on static, historical data (train/test split) before deployment.
+- **Online Evaluation**: Assessed continuously on live data in production.
+  - **Advantages**: Real-time feedback and insights.
+  - **Challenges**: Resource-intensive, requires monitoring for data drift.
+  - **Key Online Metrics**:
+    - **Latency**: Time to generate a prediction.
+    - **Throughput**: Predictions per unit of time.
+    - **Data Drift**: Change in data distribution over time.
+    - **Business Metrics**: Click-Through Rate (CTR), Conversion Rate.
+  - **A/B Testing**:
+    - **Concept**: Deploy multiple model versions (variants) to compare performance.
+    - **Implementation**: Split live traffic between variants by weight or direct requests.
 
 ### 4. Compare ML Models
-- **Consider**: Computational Complexity (Time, Space), Sample Complexity.
+- **Structured Approach**:
+  - 1. Define production environment constraints.
+  - 2. Measure performance metrics (Accuracy, RMSE, etc.).
+  - 3. Measure computational metrics (time, memory, etc.).
+  - 4. Compare models to select the best fit.
+- **Computational Complexity**:
+  - **Time Complexity**: Time to run vs. input size (n=samples, f=features).
+    - *Linear Regression*: Training `O(n*f^2 + f^3)`, Inference `O(f)`.
+    - *Logistic Regression*: Training `O(n*f)`, Inference `O(f)`.
+  - **Space Complexity**: Memory needed to run.
+    - *Linear/Logistic Regression*: `O(f)`.
+- **Sample Complexity**: Number of training samples needed for desired performance.
+- **Parametricity**:
+  - **Parametric Models**: Fixed number of parameters (e.g., Linear/Logistic Regression). Faster, easier to interpret.
+  - **Non-Parametric Models**: Parameters grow with data (e.g., KNN, Decision Trees). More flexible.
