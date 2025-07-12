@@ -3,87 +3,166 @@ title: markmap
 markmap:
   colorFreezeLevel: 2
   initialExpandLevel: 4
-  maxWidth: 300
+  maxWidth: 350
 ---
 
-# Certification Exam Refresher
+# Domain 3: Modeling (36% of Exam)
 
 ## Task Statement 3.1: ML Problem Framing
 
-### 1. Determine When to Use and When Not to Use ML
+### 1. The ML Pipeline Context
+- **Previous Step (Domain 2)**: Data Preprocessing & Visualization
+- **Current Step (This Course)**: Building, Training & Testing the ML Model
+- **Exam Focus**: Choosing the right algorithm for a business use case and knowing its performance metrics.
+
+### 2. When to Use and Not to Use ML
 
 #### When ML Might Be a Good Fit
 - **Requires Significant Data**: ML needs large datasets to build a predictable model.
-- **Requires Expertise**: Needs data processing and feature engineering to handle noise.
-- **Requires Powerful Machines**: Needs computational power to crunch data.
+- **Requires Expertise**: Needs data processing and feature engineering to handle noise and retain meaningful information.
+- **Requires Powerful & Scalable Machines**: Needs computational power to crunch data and scale as data grows.
 
 #### When ML is NOT the Right Solution
 - **Mission-Critical Applications**: Scenarios where prediction errors are unacceptable.
 - **Simple Problems**: Can be solved with simple rules and traditional programming (e.g., rule engines).
 - **Be Cognizant**: ML is an expensive solution; ensure it's the right choice.
 
-### 2. Supervised vs. Unsupervised Learning
+### 3. Identifying the Right Learning Type
 
-#### Supervised Learning
-- **Data**: Uses labeled training data.
-- **Features**: Dependent and independent features are clearly defined.
-- **Primary Task**: Predict or classify new observations based on learned patterns.
+#### Supervised Learning 👨‍🏫
+- **Analogy**: A child learning under the guidance of a teacher.
+- **Data**: Uses **labeled training data** (the outcome is already known).
+- **Goal**: Model the relationship between inputs and outputs to predict new outcomes.
 - **Feedback**: Possible, as the difference between actual and predicted values can be computed.
-- **Common Techniques**:
-  - Linear Regression
-  - Logistic Regression
-  - Time Series Forecasting
 
-#### Unsupervised Learning
-- **Data**: Deals with unlabeled data.
-- **Features**: Target feature is not available.
-- **Primary Task**: Uncover hidden structures or patterns without explicit guidance.
+#### Unsupervised Learning 🕵️
+- **Analogy**: A child figuring things out without supervision.
+- **Data**: Deals with **unlabeled data**.
+- **Goal**: Discover hidden structures, patterns, or information on its own.
 - **Feedback**: Not possible.
-- **Common Techniques**:
-  - Clustering
-  - Association Learning
-  - Dimensionality Reduction
 
-### 3. Select the Right Model Type
+#### Reinforcement Learning 🤖
+- **Analogy**: Rewarding a kid for good behavior to reinforce it.
+- **Core Idea**: An autonomous, self-learning agent learns through trial and error in an interactive environment to achieve the most optimal results.
+- **Data**: No labeled data; learns from feedback (rewards/penalties).
+- **Key Terminologies**:
+    - **Agent**: The entity learning to make decisions (e.g., a player in a maze).
+    - **Environment**: The problem space where the agent operates (e.g., the maze).
+    - **State**: The agent's current condition/position.
+    - **Action**: A choice made by the agent (e.g., move up, down, left, right).
+    - **Reward/Penalty**: Feedback from the environment based on an action.
+    - **Policy**: The agent's decision-making strategy to maximize rewards.
+- **Types**:
+    - **Model-Based**: Agent builds an internal model (a "mental map") of the environment to plan actions.
+    - **Model-Free**: Agent learns directly through trial and error without building an explicit model.
+- **Use Cases**: Self-driving vehicles, robotics, dynamic pricing, supply chain optimization.
+
+### 4. Selecting the Right Model Type
 
 #### Classification
-- **Use Case**: When the dependent feature is categorical.
-- **Variations**:
-  - **Binary Classification**: Target has two outcomes (e.g., yes/no, true/false).
-  - **Multiclass Classification**
-  - **Multilabel Classification**
+- **Use Case**: When the dependent feature is categorical (discrete classes).
+- **Analogy**: A fruit vendor sorting fruits as 'good' or 'bad'.
+- **Types**:
+    - **Binary Classification**: Two possible outcomes (e.g., Yes/No, Fraud/Legitimate).
+        - *Algorithms*: Logistic Regression, Support Vector Machines (SVM).
+    - **Multiclass Classification**: More than two mutually exclusive classes (e.g., sorting fruits into 'apples', 'oranges', 'bananas').
+        - *Algorithms*: K-Nearest Neighbors (KNN), Naive Bayes.
+    - **Multilabel Classification**: A data point can be assigned multiple labels (e.g., tagging a movie with genres like 'action', 'comedy', 'sci-fi').
+        - *Algorithms*: Ensemble methods, Deep Learning.
+- **Challenge: Imbalanced Data**
+    - **Problem**: One class (minority) is significantly smaller than another (majority), causing biased models.
+    - **Solution**: **SMOTE** (Synthetic Minority Over-sampling TEchnique) to generate new synthetic samples for the minority class.
+- **Learner Types**:
+    - **Eager Learners**: Build a model during training; fast predictions (e.g., Logistic Regression, SVM).
+    - **Lazy Learners**: Memorize training data; slow predictions (e.g., KNN).
+- **Common Algorithms**:
+    - **Logistic Regression**: Predicts a binary outcome using a sigmoid (S-shaped) curve. Computationally efficient but sensitive to outliers.
+    - **Naive Bayes**: Based on Bayes' theorem with an assumption of feature independence. Fast and handles missing data, but the independence assumption is a drawback.
+    - **Support Vector Machines (SVM)**: Finds an optimal hyperplane to separate classes. Generalizes well but is computationally expensive and memory-intensive.
+    - **K-Nearest Neighbors (KNN)**: Classifies new data based on the labels of its 'K' nearest neighbors. No training phase but is memory-intensive.
 
 #### Regression
 - **Use Case**: When the target feature is quantitative or continuous.
+- **Example**: Predicting house prices based on features like square footage.
 - **Variations**:
-  - Linear Regression
-  - Multiple Regression
-  - Polynomial Regression
+    - **Linear Regression**: One dependent and one independent feature (`Y = mx + b`).
+    - **Multiple Regression**: One dependent and multiple independent features (`Y = m1x1 + m2x2 + ... + b`).
+    - **Polynomial Regression**: Used when the relationship is non-linear (e.g., `Y = m1x1^2 + m2x2 + b`).
 
-#### Time Series Forecasting
-- **Use Case**: For data collected at regular time intervals.
+#### Time Series Forecasting 📈
+- **Use Case**: For data collected at regular time intervals (e.g., stock prices, sales data).
+- **Key Feature**: **Time** is always an independent feature.
 - **Core Components**:
-  - **Trend**: Directionality of data over time.
-  - **Seasonality**: Periodic fluctuations at regular intervals.
-  - **Cyclical Variations**: Non-repeating fluctuations at irregular intervals.
-  - **Irregularity**: Randomness or noise in the data.
+    - **Trend**: The direction of data over time (upward, downward).
+    - **Seasonality**: Periodic fluctuations at regular intervals (e.g., higher sales in winter).
+    - **Cyclical Variations**: Non-repeating fluctuations at irregular intervals (e.g., economic cycles).
+    - **Irregularity**: Randomness or noise in the data.
+- **Data Types**:
+    - **Stationary Data**: Statistical properties (mean, variance) are constant over time. Easier to model.
+    - **Non-Stationary Data**: Statistical properties change over time. Requires transformation (e.g., differencing) to make it stationary.
+- **Limitations**: Sensitive to missing data, assumes linear relationships sometimes, relies heavily on historical data.
 
 #### Clustering
 - **Type**: Unsupervised learning algorithm.
 - **Goal**: Group similar data points into clusters based on similarity (distance).
+- **Hard vs. Soft Clustering**:
+    - **Hard Clustering**: Each data point belongs to only one cluster (e.g., K-Means).
+    - **Soft Clustering**: Each data point has a probability of belonging to each cluster (e.g., Fuzzy C-Means).
 - **Categories**:
-  - **Centroid-based**: Requires a predetermined number of clusters.
-  - **Density-based**: Does not require a predetermined number of clusters.
-  - **Hierarchical**: Builds a hierarchy of clusters based on similarities.
-  - **Distribution-based**: Assumes data is from a mixture of probability distributions.
+    - **Centroid-based (e.g., K-Means)**: Requires a predetermined number of clusters (`k`).
+    - **Density-based (e.g., DBScan)**: Does not require a predetermined number of clusters; good at handling outliers.
+    - **Hierarchical**: Builds a hierarchy of clusters (a `dendrogram`). Can be agglomerative (bottom-up) or divisive (top-down).
+    - **Distribution-based (e.g., Gaussian Mixture Model)**: Assumes data comes from a mixture of probability distributions.
+- **Use Cases**: Customer segmentation, anomaly/fraud detection, document organization.
 
-#### Advanced Techniques: Deep Learning
-- **Purpose**: Addresses limitations of traditional ML, like handling large/complex data and non-linear relationships.
-- **Concept**: A subset of ML modeled after the human brain, using neural networks with multiple layers.
+#### Association Learning
+- **Type**: Unsupervised learning.
+- **Goal**: Discover hidden patterns and relationships between features (e.g., "if a customer buys X, they are likely to buy Y").
+- **Analogy**: A vendor notices people who buy apples and oranges also buy bananas, so they place them together.
+- **Terminology**:
+    - **Rule**: `If {Antecedent} -> Then {Consequent}`
+    - **Metrics**:
+        - **Support**: Frequency of items occurring together.
+        - **Confidence**: Likelihood that the consequent is purchased when the antecedent is.
+        - **Lift**: Strength of the association (>1 means positive correlation).
+- **Algorithms**: Apriori, FP-Growth, Eclat.
+- **Use Cases**: Market basket analysis, recommendation systems, supply chain management.
+
+#### Advanced: Deep Learning & Neural Networks 🧠
+- **Purpose**: A subset of ML that addresses limitations of traditional ML, like handling large/complex data and non-linear relationships.
+- **Concept**: Modeled after the human brain, using artificial neural networks with multiple layers.
+- **Artificial Neuron (Perceptron)**:
+    - **Components**: Inputs, Weights, Bias, Net Sum, Activation Function.
+    - **Analogy to Biological Neuron**: Dendrites (Inputs), Axon (Output), Synapse (Weights).
+- **Activation Functions**: Introduce non-linearity.
+    - *Examples*: Sigmoid (S-shaped curve for probability), Tanh, **ReLU** (Rectified Linear Unit - fast and effective), Softmax.
+- **Neural Network Architecture**:
+    - **Layers**: Input Layer, Hidden Layer(s), Output Layer.
+    - **Training Process**:
+        - **Forward Propagation**: Data flows from input to output.
+        - **Cost Function**: Measures the error in prediction.
+        - **Backward Propagation**: Error is fed back to adjust weights and biases.
+- **Challenges**: Requires high computational power, large amounts of data, and careful hyperparameter tuning.
 - **Techniques**:
-  - **CNN (Convolutional Neural Networks)**: Uses layers to extract features for classification/detection.
-  - **RNN (Recurrent Neural Networks)**: Designed to process sequential data using internal memory.
-  - **Transfer Learning**: Leverages knowledge from a pre-trained model on one task to improve performance on a new, related task.
+    - **CNN (Convolutional Neural Networks)**:
+        - **Use Case**: Ideal for image and video processing.
+        - **Architecture**:
+            1. **Convolution Layer**: Applies filters (kernels) to extract features (creates a feature map).
+            2. **Pooling Layer**: Downsamples the feature map (e.g., MaxPooling).
+            3. **Flattening Layer**: Converts 2D data to a 1D vector.
+            4. **Fully Connected Layer**: Performs classification based on extracted features.
+    - **RNN (Recurrent Neural Networks)**:
+        - **Use Case**: Designed to process sequential data (text, time series, audio) by using an internal memory.
+        - **Key Idea**: Information flows in loops, allowing the network to persist information from previous steps.
+        - **Architectures**: One-to-One, One-to-Many (Image Captioning), Many-to-One (Sentiment Analysis), Many-to-Many (Translation).
+        - **Advanced RNNs**:
+            - **LSTM (Long Short-Term Memory)**: Solves RNN's problem with long-range dependencies using a system of 'gates'.
+            - **GRU (Gated Recurrent Unit)**: Similar to LSTM but with a simpler architecture, making it computationally less expensive.
+    - **Transfer Learning**:
+        - **Concept**: Reusing a pre-trained model on a new, related task.
+        - **Analogy**: A Java expert learning Python reuses fundamental programming concepts.
+        - **Process**: Freeze the weights of early layers (feature extraction) and retrain the final task-specific layers on new data.
+        - **Benefits**: Reduces data scarcity issues, saves computational resources, and enhances performance.
 
 ---
 
