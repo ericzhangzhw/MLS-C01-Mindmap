@@ -9,6 +9,10 @@ markmap:
 # Enhanced AWS ML Module Review
 
 - ## 1. ML Implementation & Operations
+  - ### Data Ingestion & Transformation
+    - **AWS Kinesis**: Collect and process streaming data in real-time.
+    - **AWS Glue**: An ETL (extract, transform, load) service to prepare and integrate data from various sources (S3, RDS, etc.).
+    - **Amazon EMR**: Process and analyze big data using frameworks like Apache Hadoop, Spark, and Hive.
   - ### Model Deployment Strategies
     - #### **SageMaker Hosted Endpoints** (Real-time Inference)
       - The easiest way to deploy a model.
@@ -48,64 +52,74 @@ markmap:
       - **Configuration**: Assign a **weight** to each **production variant** (e.g., 20% to model A, 80% to model B).
       - **Updating**: Weights can be updated without any application code changes.
       - **Direct Invocation**: Call a specific model version using the `TargetVariant` parameter.
+  - ### Service Quotas (Limits)
+    - Limits exist on services (e.g., number of specific EC2 instances).
+    - Can impact SageMaker jobs (e.g., Batch Transform).
+    - **Management**:
+      - Request quota increases in the AWS Console.
+      - Check limits with **Trusted Advisor**.
 
 - ## 2. Security & Identity
   - ### Identity & Access Management (IAM)
-    - **Principle of Least Privilege**: Grant only the permissions an entity (user, role, service) needs to perform its function.
-    - **SageMaker Execution Roles**: An IAM role that grants SageMaker permission to perform operations on your behalf (e.g., reading data from S3, writing model artifacts).
-      - The default `AmazonSagemakerFullAccess` policy grants broad permissions; it's best practice to create more restrictive, custom policies.
+    - **Principle of Least Privilege**: Grant only the permissions an entity needs to perform its function.
+    - **SageMaker Execution Roles**: An IAM role that grants SageMaker permission to perform operations on your behalf.
+      - The default `AmazonSagemakerFullAccess` policy is broad; it's best practice to create restrictive, custom policies.
   - ### Data & Network Protection
     - #### **Amazon S3 Security**
       - **Default**: All S3 buckets are **private**.
-      - **Bucket Policies**: Define fine-grained access permissions for users and roles.
-      - **Conditions**: Can be used in policies to enforce rules, like requiring HTTPS.
+      - **Bucket Policies**: Define fine-grained access permissions.
+      - **Conditions**: Enforce rules, like requiring HTTPS.
     - #### **Encryption with AWS KMS**
-      - **How it works**: KMS uses **Envelope Encryption** (a Customer Master Key encrypts a Data Key, which encrypts your data).
-      - **Key Policies**: Control which users and roles can use KMS keys.
-      - **Critical for SageMaker**: If you use a customer-managed KMS key for S3 data, the SageMaker Execution Role **must** have `encrypt` and `decrypt` permissions in the key's policy.
+      - **How it works**: Uses **Envelope Encryption**.
+      - **Key Policies**: Control which users/roles can use keys.
+      - **Critical**: The SageMaker Execution Role **must** have `encrypt` and `decrypt` permissions for any customer-managed KMS key it needs to use.
     - #### **VPC & Private Communication**
-      - **Virtual Private Cloud (VPC)**: Your logical, isolated data center in AWS.
-      - **VPC Endpoints (AWS PrivateLink)**
-        - Enables **private and secure communication** between your VPC and AWS services (like SageMaker and S3).
-        - Traffic **never leaves the Amazon network**; no internet gateway, public IPs, or public subnets are needed.
+      - **VPC Endpoints (AWS PrivateLink)**: Enables **private and secure communication** between your VPC and AWS services. Traffic **never leaves the Amazon network**.
   - ### Other Security Concepts
-    - **Data Anonymization**: Techniques like hashing values with Amazon Athena to protect sensitive data that cannot be removed.
-    - **Security Groups**: A stateful virtual firewall for EC2 instances that controls inbound and outbound traffic.
+    - **Data Anonymization**: Hashing values with Athena.
+    - **Security Groups**: Stateful virtual firewall for EC2 instances.
 
 - ## 3. MLOps, Monitoring & Governance
   - ### Monitoring vs. Auditing
     - #### **Amazon CloudWatch (Monitoring)**
-      - **Purpose**: Monitors the **performance and health** of systems and applications.
-      - **Metrics**: Collects near-real-time utilization metrics (CPU, Memory, GPU) for SageMaker instances.
-      - **CloudWatch Logs**: Centralizes, monitors, and stores log files.
-      - **CloudWatch Events (EventBridge)**: Responds to system events and state changes (e.g., a training job completing).
-      - **CloudWatch Alarms**: Sends notifications (via SNS/SES) when a metric breaches a defined threshold.
+      - **Purpose**: Monitors the **performance and health** of systems.
+      - **Metrics**: Collects near-real-time utilization metrics (CPU, Memory, GPU).
+      - **CloudWatch Logs**: Centralizes and stores log files.
+      - **CloudWatch Events (EventBridge)**: Responds to system events (e.g., training job completion).
+      - **CloudWatch Alarms**: Sends notifications (via SNS/SES) when a metric breaches a threshold.
     - #### **AWS CloudTrail (Auditing)**
-      - **Purpose**: Provides a **governance and audit trail** of actions in your AWS account.
-      - **What it logs**: API calls made by users, roles, or services (e.g., `CreateTrainingJob`, `CreateModel`, `CreateEndpoint`).
+      - **Purpose**: Provides a **governance and audit trail** of API calls.
+      - **What it logs**: Actions like `CreateTrainingJob`, `CreateModel`.
       - **Long-term storage**: Create a **trail** to save logs indefinitely to an S3 bucket.
+  - ### SageMaker Algorithm Selection
+    - #### **Supervised Learning**
+      - **Classification (Binary/Multi-class)**: Linear Learner, k-NN, XGBoost, Factorization Machines.
+      - **Regression**: Linear Learner, k-NN, XGBoost, Factorization Machines.
+    - #### **Time-Series Forecasting**
+      - **Algorithm**: DeepAR.
+    - #### **Unsupervised Learning**
+      - **Anomaly Detection**: Random Cut Forest.
+      - **Clustering**: K-Means.
+      - **Topic Modeling**: Latent Dirichlet Allocation (LDA), Neural Topic Model (NTM).
+    - #### **Text Analysis**
+      - **Text Classification**: BlazingText, Text Classification (TensorFlow).
+      - **Translation / Summarization / Speech-to-Text**: Seq2Seq.
+    - #### **Image & Computer Vision**
+      - **Image Classification**: Based on MXNet.
+      - **Object Detection**: Based on MXNet, TensorFlow.
+      - **Pixel-level Categorization**: Semantic Segmentation.
   - ### Advanced Customization & Automation
     - #### **Custom Docker Containers**
-      - **Use Case**: When a pre-built SageMaker container doesn't fit your needs (e.g., custom algorithm, specific library versions).
-      - **Process**:
-        1.  Write a `Dockerfile`.
-        2.  Build the Docker image.
-        3.  Push the image to **Amazon Elastic Container Registry (ECR)**.
-        4.  Use the ECR image URI in your SageMaker training or deployment job.
+      - **Use Case**: When a built-in algorithm doesn't fit your needs.
+      - **Process**: Build a Docker image with your custom code/packages and push it to **Amazon ECR**.
     - #### **Golden Images (AMIs)**
-      - **What It Is**: A pre-configured Amazon Machine Image from an existing EC2 instance.
-      - **Includes**: OS, software, packages, scripts, and configurations.
-      - **Benefit**: Ensures consistent configuration, avoids manual setup, and is used with Auto Scaling.
+      - A pre-configured EC2 image (OS, software, scripts).
+      - Ensures consistency and is used with Auto Scaling.
     - #### **Retraining Pipelines with AWS Step Functions**
-      - **Purpose**: Orchestrate and automate the entire ML workflow (data pre-processing, training, evaluation, deployment).
-      - **Benefits**: Visualizes the pipeline, logs each step's state for debugging, and manages dependencies.
+      - Orchestrate and automate the entire ML workflow.
   - ### SageMaker Model Monitor
     - **Purpose**: Continuously monitor a deployed model for drift.
-    - **Detects Drift In**:
-      - **Data Quality**: Changes in the production data distribution.
-      - **Model Quality**: Degradation in performance metrics (e.g., accuracy).
-      - **Bias**: Introduction of bias as data changes.
-      - **Feature Attribution**: Changes in feature importance.
+    - **Detects Drift In**: Data Quality, Model Quality, Bias, and Feature Attribution.
 
 - ## 4. AWS AI/ML Service Landscape
   - ### The AWS Machine Learning Stack (3 Layers)
@@ -115,14 +129,18 @@ markmap:
     - #### **Middle Layer: Amazon SageMaker**
       - **For**: Developers and data scientists wanting to streamline the ML lifecycle.
     - #### **Top Layer: AI/ML Services**
-      - **For**: Customers who want to add intelligence to apps without building/training models.
+      - **For**: Customers wanting to add intelligence to apps without building/training models.
   - ### High-Level AI Service Details
-    - **Textract**: Extracts text/data from documents.
-    - **Transcribe**: Speech-to-Text.
-    - **Translate**: Language translation.
-    - **Comprehend**: NLP for sentiment, key phrases, topics.
-    - **Lex**: Builds conversational chatbots.
-    - **Polly**: Text-to-Speech.
-    - **Rekognition**: Image and video analysis.
-    - **Forecast**: Time-series forecasting.
-    - **Fraud Detector**: Online fraud detection.
+    - #### **Text & Document Analysis**
+      - **Textract**: Extracts text and structured data from documents (PDFs, images, forms) using OCR. Use for ID processing or invoice analysis.
+      - **Comprehend**: Uses NLP to discover insights in text. Performs sentiment analysis, identifies key phrases, topics, and language.
+    - #### **Speech & Language**
+      - **Transcribe**: Speech-to-text service. Takes audio files or streams as input.
+      - **Translate**: Neural machine translation for large volumes of text or HTML. Supports over 70 languages.
+      - **Polly**: Text-to-speech service that generates natural-sounding audio.
+      - **Lex**: Builds conversational interfaces (chatbots) using natural language understanding (NLU).
+    - #### **Vision**
+      - **Rekognition**: Image and video analysis to detect objects, people, text, scenes, and activities.
+    - #### **Forecasting & Fraud**
+      - **Forecast**: Time-series forecasting service. Uses historical data to predict future demand (e.g., for retail, staffing).
+      - **Fraud Detector**: Builds custom fraud detection models based on your historical data for low-latency, real-time online fraud prevention.
