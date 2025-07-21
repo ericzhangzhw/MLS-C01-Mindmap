@@ -385,12 +385,23 @@ markmap:
 ### 2. Visualization Techniques & Descriptive Statistics
 - #### Visualizing Relationships, Comparisons & Compositions
   - **Bar Charts**: For comparing *categorical* data. Can be clustered to compare multiple series.
+    - ![](./img/barchart.png)
   - **Line Charts**: For showing how data changes over *time*. Can compare trends for multiple categories.
+    - ![](./img/linechart.png)
   - **Scatter Plots**: For showing the relationship between two *numerical* features. Good for seeing correlation and outliers.
+    - ![](./img/scatterplot.png)
   - **Bubble Charts**: Extends scatter plots to show a *third* numerical feature as the bubble size.
+    - ![](./img/bubblechart.png)
   - **Pie Charts**: For showing part-to-whole relationships in data composition. Best for few categories.
+    - ![](./img/piechart.png)
   - **Stacked Bar Charts**: For comparing totals while also showing the composition of each bar.
+    - ![](./img/stackedbar.png)
   - **Heatmaps**: Represents numerical data tables using color intensity. Great for spotting patterns in large data.
+    - ![](./img/heatmap.png)
+  - **Box plot**: A box plot is a method for graphically depicting groups of numerical data through their quartiles. Box plots may also have lines extending from the boxes (whiskers) indicating variability outside the upper and lower quartiles, hence the terms box-and-whisker plot and box-and-whisker diagram. Outliers may be plotted as individual points.
+    - ![](./img/boxplot.png)
+  - **Histogram**: A histogram is a graphical representation that organizes a group of data points into user-specified ranges. Similar in appearance to a bar graph, the histogram condenses a data series into an easily interpreted visual by taking many data points and grouping them into logical ranges or bins.
+    - ![](./img/histogram.png)
 - #### Descriptive Statistics for Visualization
   - **Goal**: Understand and describe the data (not make predictions).
   - **Key Metrics for Visualization**

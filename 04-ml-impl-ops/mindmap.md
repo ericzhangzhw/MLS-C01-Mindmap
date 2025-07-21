@@ -15,13 +15,17 @@ markmap:
     - **Amazon EMR**: Process and analyze big data using frameworks like Apache Hadoop, Spark, and Hive.
   - ### Model Deployment Strategies
     - #### **SageMaker Hosted Endpoints** (Real-time Inference)
-      - The easiest way to deploy a model.
+      - The easiest way to deploy a model for real-time, low-latency needs.
       - Creates a persistent HTTPS endpoint for on-demand predictions.
       - **How it works**: Deploys a model to a container on **ECS**, running on **EC2**. Fully managed by SageMaker.
       - **Deployment**: Use the `deploy()` method in the Python SDK.
+      - **Accelerators**: Use **Elastic Inference (EI)** to attach fractional GPU acceleration.
     - #### **SageMaker Serverless Inference**
       - **Use Case**: For workloads with intermittent or unpredictable traffic and idle periods.
       - **Benefit**: Pay-per-use, automatically scales compute resources. Can tolerate cold starts.
+    - #### **SageMaker Asynchronous Inference**
+      - **Use Case**: Queues incoming requests; ideal for large payloads (up to 1GB), long processing times, and near real-time latency.
+      - **Benefit**: Scales instance count to zero when idle to save costs.
     - #### **SageMaker Batch Transform**
       - **Use Case**: Run inference on an entire dataset at once (offline).
       - **Benefit**: No persistent endpoint needed. Manages provisioning and de-provisioning of resources.
@@ -46,18 +50,21 @@ markmap:
       - **Benefits**:
         - **Cost-Effective**: Improves container utilization, avoiding a new endpoint for each model.
         - **Reduced Overhead**: Manage one endpoint instead of many.
-  - ### Model Testing in Production
+  - ### Production Testing & Deployment Patterns
     - #### **A/B Testing (Production Variants)**
       - **Concept**: Test different model versions behind the same endpoint. Variants can use different algorithms, datasets, or instance types.
+      - **Use Case**: Gauge the business impact (e.g., revenue, click-through) of a new model and understand the effects of model drift.
       - **Traffic Distribution Methods**:
-        - **Weight-based Routing**: Assign a **weight** to each variant in the endpoint configuration (e.g., 0.2 for 20%, 0.8 for 80%). Weights can be updated without application code changes.
+        - **Weight-based Routing**: Assign a **weight** to each variant in the endpoint configuration (e.g., 0.2 for 20%, 0.8 for 80%).
         - **Direct Invocation**: Invoke a specific model version by specifying the `TargetVariant` in the API call.
-  - ### Service Quotas (Limits)
-    - Limits exist on services (e.g., number of specific EC2 instances).
-    - Can impact SageMaker jobs (e.g., Batch Transform).
-    - **Management**:
-      - Request quota increases in the AWS Console.
-      - Check limits with **Trusted Advisor**.
+    - #### **Blue/Green Deployment**
+      - **Concept**: Maintain two identical environments (blue=old, green=new). Switch all traffic to the new environment at once for a fast rollback if needed.
+    - #### **Canary Deployment**
+      - **Concept**: Incrementally shift a small portion of traffic to the new model. Monitor closely and roll back if issues arise.
+      - **Implementation**: Use `InitialVariantWeight` in SageMaker to manage traffic distribution.
+    - #### **Shadow Deployment**
+      - **Concept**: Run the new model in parallel with the old one, processing real traffic but without influencing production decisions.
+      - **Use Case**: A final check to compare performance and monitor model output distribution before going live.
 
 - ## 2. Security & Identity
   - ### Identity & Access Management (IAM)
@@ -109,6 +116,11 @@ markmap:
       - **What it logs**: Actions like `CreateTrainingJob`, `CreateModel`, `UpdateEndpointWeights`.
       - **Long-term storage**: Create a **trail** to save logs indefinitely to an S3 bucket.
   - ### Automation & Orchestration
+    - #### **CI/CD for ML (MLOps Best Practices)**
+      - **Goal**: Fully automate the training and deployment cycle to prevent human error.
+      - **Tools**: Use **SageMaker Pipelines** & **AWS CodePipeline**.
+      - **Governance**: Version control all data, code, and build artifacts using **Git** and tags.
+      - **Collaboration**: Use pull requests for peer review and knowledge sharing.
     - #### **Retraining Pipelines with AWS Step Functions**
       - **Purpose**: A serverless orchestration tool to automate and visualize the entire ML workflow.
       - **Benefits**:
@@ -137,6 +149,12 @@ markmap:
       - **Topic Modeling**: LDA, NTM.
     - #### **Text Analysis**: BlazingText, Seq2Seq.
     - #### **Image & Computer Vision**: Image Classification, Object Detection, Semantic Segmentation.
+  - ### Service Quotas (Limits)
+    - Limits exist on services (e.g., number of specific EC2 instances).
+    - Can impact SageMaker jobs (e.g., Batch Transform).
+    - **Management**:
+      - Request quota increases in the AWS Console.
+      - Check limits with **Trusted Advisor**.
 
 - ## 4. AWS AI/ML Service Landscape
   - ### The AWS Machine Learning Stack (3 Layers)
